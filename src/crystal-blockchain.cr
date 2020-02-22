@@ -8,7 +8,7 @@ module Crystal::Blockchain
   blockchain << Block.new(0, Time.local.to_s, "Instance Genesis!", "")
 
   get "/" do
-    blockchain.map(&.to_tuple).to_json
+    blockchain.to_json
   end
 
   post "/new_block" do |env|
@@ -22,7 +22,6 @@ module Crystal::Blockchain
       p new_block
       puts
     end
-
   end
 
   Kemal.run

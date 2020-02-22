@@ -37,16 +37,30 @@ class Block
     sha256.to_s
   end
 
-  def to_tuple
-    {
-      index: @index,
-      timestamp: @timestamp,
-      data: @data,
-      prev_hash: @prev_hash,
-      difficulty: Block.difficulty,
-      nonce: @nonce,
-      hash: @hash
-    }
+  def to_json(json : JSON::Builder)
+    json.object do
+      json.field "index" do
+        @index.to_json(json)
+      end
+      json.field "timestamp" do
+        @timestamp.to_json(json)
+      end
+      json.field "data" do
+        @data.to_json(json)
+      end
+      json.field "prev_hash" do
+        @prev_hash.to_json(json)
+      end
+      json.field "difficulty" do
+        Block.difficulty.to_json(json)
+      end
+      json.field "nonce" do
+        @nonce.to_json(json)
+      end
+      json.field "hash" do
+        @hash.to_json(json)
+      end
+    end
   end
 
   def valid?(last_block : Block)
