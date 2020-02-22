@@ -1,7 +1,5 @@
-module Block
-  extend self
-
-  def create(index, timestamp, data, prev_hash, nonce)
+class Block
+  def self.create(index, timestamp, data, prev_hash, nonce)
     block = {
       index: index,
       timestamp: timestamp,
@@ -13,7 +11,7 @@ module Block
     block.merge({ hash: self.calculate_hash(block)})
   end
 
-  def generate(last_block, data)
+  def self.generate(last_block, data)
     current_block = self.create(
       last_block[:index] + 1,
       Time.local.to_s,
@@ -32,7 +30,7 @@ module Block
     current_block.merge({ hash: self.calculate_hash(current_block) })
   end
 
-  def is_valid?(block, last_block)
+  def self.is_valid?(block, last_block)
     return false unless block[:index] == last_block[:index] + 1
     return false unless block[:prev_hash] == last_block[:hash]
     return false unless calculate_hash(block) == block[:hash]
@@ -40,12 +38,12 @@ module Block
     true
   end
 
-  private def hash_valid?(hash, difficulty)
+  private def self.hash_valid?(hash, difficulty)
     prefix = "0" * difficulty
     hash.starts_with?(prefix)
   end
 
-  private def calculate_hash(block)
+  private def self.calculate_hash(block)
     plain_text = "
       #{block[:index]}
       #{block[:timestamp]}
@@ -59,7 +57,7 @@ module Block
     sha256.to_s
   end
 
-  private def difficulty
+  private def self.difficulty
     3
   end
 end
