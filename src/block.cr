@@ -1,4 +1,37 @@
 class Block
+  @hash : String
+
+  def initialize(@index : Int32, @timestamp : String, @data : String, @prev_hash : String)
+    @nonce = 0
+    @hash = calculate_hash
+  end
+
+  def calculate_hash : String
+    plain_text = "
+      #{@index}
+      #{@timestamp}
+      #{@data}
+      #{@prev_hash}
+      #{@nonce}
+    "
+
+    sha256 = OpenSSL::Digest.new("SHA256")
+    sha256.update(plain_text)
+    sha256.to_s
+  end
+
+  def to_tuple
+    {
+      index: @index,
+      timestamp: @timestamp,
+      data: @data,
+      prev_hash: @prev_hash,
+      difficulty: Block.difficulty,
+      nonce: @nonce,
+      hash: @hash
+    }
+  end
+  
   def self.create(index, timestamp, data, prev_hash, nonce)
     block = {
       index: index,
@@ -57,7 +90,7 @@ class Block
     sha256.to_s
   end
 
-  private def self.difficulty
+  def self.difficulty
     3
   end
 end

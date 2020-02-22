@@ -14,10 +14,12 @@ module Crystal::Blockchain
     nonce: String
   )
 
+  new_blockchain = [] of Block
+  new_blockchain << Block.new(0, Time.local.to_s, "Instance Genesis!", "")
   blockchain << Block.create(0, Time.local.to_s, "Genesis block's data!", "", "0x1")
 
   get "/" do
-    blockchain.to_json
+    new_blockchain.map(&.to_tuple).to_json
   end
 
   post "/new_block" do |env|
