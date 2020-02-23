@@ -24,6 +24,7 @@ class Block
   end
 
   def calculate_hash : String
+    sleep(0.01)
     plain_text = "
       #{@index}
       #{@timestamp}
