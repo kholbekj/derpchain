@@ -11,5 +11,12 @@ module Crystal::Blockchain
     blockchain.to_json
   end
 
+  spawn do
+    loop do
+      block = Block.generate(blockchain.last, "I, Bob, am sending 5 coins to Alice")
+      blockchain << block if block.valid?(blockchain.last)
+    end
+  end
+
   Kemal.run
 end
