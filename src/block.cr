@@ -5,7 +5,7 @@ class Block
     block = Block.new(
       last_block.next_index,
       Time.local.to_s,
-      data,
+      ["I am creating 10 coins for Bob", data],
       last_block.hash,
     )
 
@@ -18,7 +18,7 @@ class Block
     block
   end
 
-  def initialize(@index : Int32, @timestamp : String, @data : String, @prev_hash : String)
+  def initialize(@index : Int32, @timestamp : String, @data : Array(String), @prev_hash : String)
     @nonce = 0
     @hash = calculate_hash
   end
