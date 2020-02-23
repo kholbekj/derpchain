@@ -6,6 +6,7 @@ module Crystal::Blockchain
 
   blockchain = [] of Block
   blockchain << Block.new(0, Time.local.to_s, ["I am creating 10 coins for Bob"], "")
+  channel = Channel(String).new
 
   get "/" do
     blockchain.to_json
@@ -17,12 +18,13 @@ module Crystal::Blockchain
     recipient = env.params.json["recipient"].as(String)
 
     data = "I, #{sender}, am sending #{amount} coins to #{recipient}"
+    channel.send(data)
     data
   end
 
   spawn do
     loop do
-      block = Block.generate(blockchain.last, "I, Bob, am sending 5 coins to Alice")
+      block = Block.generate(blockchain.last, "I, Bob, am sending 5 coins to Alice", channel)
       blockchain << block if block.valid?(blockchain.last)
     end
   end

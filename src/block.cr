@@ -1,7 +1,7 @@
 class Block
   getter hash : String
 
-  def self.generate(last_block, data)
+  def self.generate(last_block, data, transaction_channel)
     block = Block.new(
       last_block.next_index,
       Time.local.to_s,
@@ -11,6 +11,12 @@ class Block
 
     until block.hash_under_target?
       puts "Mining! Not solution: #{block.render}"
+      select 
+      when transaction = transaction_channel.receive
+        block.add_transaction!(transaction)
+      else
+      end
+
       block.increment_nonce!
     end
 
