@@ -89,6 +89,10 @@ class Block
     @index + 1
   end
 
+  def add_transaction!(transaction : String)
+    @data << transaction
+  end
+
   def self.difficulty
     3
   end
