@@ -11,18 +11,5 @@ module Crystal::Blockchain
     blockchain.to_json
   end
 
-  post "/new_block" do |env|
-    data = env.params.json["data"].as(String)
-
-    new_block = Block.generate(blockchain.last, data)
-
-    if new_block.valid?(blockchain.last)
-      blockchain << new_block
-      puts
-      p new_block
-      puts
-    end
-  end
-
   Kemal.run
 end
