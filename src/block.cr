@@ -10,7 +10,6 @@ class Block
     )
 
     until block.hash_under_target?
-      puts "Mining! Not solution: #{block.render}"
       select 
       when transaction = transaction_channel.receive
         block.add_transaction!(transaction)
@@ -24,19 +23,29 @@ class Block
     block
   end
 
-  def initialize(@index : Int32, @timestamp : String, @data : Array(String), @prev_hash : String)
-    @nonce = 0
+  def self.from_json(json_block : JSON::Any)
+    data = json_block["data"].as_a.map(&.as_s)
+    Block.new(
+      json_block["index"].as_i,
+      json_block["timestamp"].as_s,
+      data,
+      json_block["prev_hash"].as_s,
+      json_block["nonce"].as_i
+    )
+  end
+
+  def initialize(@index : Int32, @timestamp : String, @data : Array(String), @prev_hash : String, @nonce : Int32 = 0)
     @hash = calculate_hash
   end
 
   def calculate_hash : String
     sleep(0.01)
     plain_text = "
-      #{@index}
-      #{@timestamp}
-      #{@data}
-      #{@prev_hash}
-      #{@nonce}
+    #{@index}
+    #{@timestamp}
+    #{@data}
+    #{@prev_hash}
+    #{@nonce}
     "
 
     sha256 = OpenSSL::Digest.new("SHA256")
