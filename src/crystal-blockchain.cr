@@ -39,18 +39,14 @@ module Crystal::Blockchain
       puts
       puts "Checking for new blocks"
       other_ports.each do |other_port|
-        begin
-          node = Node.new(other_port)
-          node.get_chain
-          puts "Other chain is #{node.chain_length} long"
-          puts "My chain is #{blockchain.size} long"
-          if node.chain_length > blockchain.size
-            puts "Importing..."
-            blockchain = node.import_chain
-            puts "Imported!"
-          end
-        rescue 
-          puts "Can't connect to node with port #{other_port}"
+        node = Node.new(other_port)
+        node.get_chain
+        puts "Other chain is #{node.chain_length} long"
+        puts "My chain is #{blockchain.size} long"
+        if node.chain_length > blockchain.size
+          puts "Importing..."
+          blockchain = node.import_chain
+          puts "Imported!"
         end
       end
       sleep 10
