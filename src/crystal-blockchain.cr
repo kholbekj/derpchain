@@ -7,7 +7,7 @@ module Crystal::Blockchain
 
   PORTS = [1111, 1112, 1113]
   my_port = ARGV.any? ? ARGV.first.to_i : 3000
-  other_ports = PORTS.select { |p| p != my_port }
+  other_nodes = PORTS.reject { |p| p == my_port }.map { |p| Node.new(p) }
 
   blockchain = [] of Block
   blockchain << Block.new(0, Time.local.to_s, ["I am creating 10 coins for Bob"], "")
@@ -38,10 +38,9 @@ module Crystal::Blockchain
     loop do
       puts
       puts "Checking for new blocks"
-      other_ports.each do |other_port|
-        node = Node.new(other_port)
+      other_nodes.each do |node|
         node.get_chain
-        puts "Other chain is #{node.chain_length} long"
+        puts "Other chain is #{node.chain_length} long" if node.reachable?
         puts "My chain is #{blockchain.size} long"
         if node.chain_length > blockchain.size
           puts "Importing..."

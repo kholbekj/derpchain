@@ -1,14 +1,17 @@
 class Node
   def initialize(@port : Int32)
     @body = [] of JSON::Any
+    @reachable = false
   end
 
   def get_chain
     begin
       response = HTTP::Client.get "localhost:#{@port}"
       @body = JSON.parse(response.body).as_a
+      @reachable = true
     rescue
       puts "Can't connect to node with port #{@port}"
+      @reachable = false
     end
   end
 
@@ -28,5 +31,9 @@ class Node
       end
     end
     new_blockchain
+  end
+
+  def reachable?
+    @reachable
   end
 end
