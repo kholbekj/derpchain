@@ -1,5 +1,6 @@
 require "kemal"
 require "./block"
+require "./node"
 
 module Crystal::Blockchain
   VERSION = "0.1.0"
@@ -39,23 +40,13 @@ module Crystal::Blockchain
       puts "Checking for new blocks"
       other_ports.each do |other_port|
         begin
-          response = HTTP::Client.get "localhost:#{other_port}"
-          body = JSON.parse(response.body)
-          puts "Other chain is #{body.as_a.size} long"
+          node = Node.new(other_port)
+          node.get_chain
+          puts "Other chain is #{node.chain_length} long"
           puts "My chain is #{blockchain.size} long"
-          if body.as_a.size > blockchain.size
+          if node.chain_length > blockchain.size
             puts "Importing..."
-            new_blockchain = [] of Block
-            body.as_a.each do |json_block|
-              new_blockchain << Block.from_json(json_block)
-              unless new_blockchain.size == 1 || new_blockchain.last.valid?(new_blockchain.last(2).first)
-                puts "cheats!"
-                puts new_blockchain.last.render
-                puts new_blockchain.last(2).first.render
-                raise "Other node is cheating!"
-              end
-            end
-            blockchain = new_blockchain
+            blockchain = node.import_chain
             puts "Imported!"
           end
         rescue 
