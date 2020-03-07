@@ -1,11 +1,11 @@
 class Block
   getter hash : String
 
-  def self.generate(last_block, data, transaction_channel)
+  def self.generate(last_block, transaction_channel)
     block = Block.new(
       last_block.next_index,
       Time.local.to_s,
-      ["I am creating 10 coins for Bob", data],
+      [Transaction.create_coinbase],
       last_block.hash,
     )
 
@@ -24,7 +24,7 @@ class Block
   end
 
   def self.from_json(json_block : JSON::Any)
-    data = json_block["data"].as_a.map(&.as_s)
+    data = json_block["data"].as_a.map {|t| Transaction.from_json(t) }
     Block.new(
       json_block["index"].as_i,
       json_block["timestamp"].as_s,
@@ -34,7 +34,7 @@ class Block
     )
   end
 
-  def initialize(@index : Int32, @timestamp : String, @data : Array(String), @prev_hash : String, @nonce : Int32 = 0)
+  def initialize(@index : Int32, @timestamp : String, @data : Array(Transaction), @prev_hash : String, @nonce : Int32 = 0)
     @hash = calculate_hash
   end
 
@@ -104,7 +104,7 @@ class Block
     @index + 1
   end
 
-  def add_transaction!(transaction : String)
+  def add_transaction!(transaction : Transaction)
     @data << transaction
   end
 

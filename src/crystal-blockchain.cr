@@ -2,6 +2,7 @@ require "kemal"
 require "./block"
 require "./node"
 require "./keypair"
+require "./transaction"
 require "option_parser"
 
 OptionParser.parse do |parser|
@@ -24,26 +25,26 @@ module Crystal::Blockchain
   other_nodes = PORTS.reject { |p| p == my_port }.map { |p| Node.new(p) }
 
   blockchain = [] of Block
-  blockchain << Block.new(0, Time.local.to_s, ["I am creating 10 coins for Bob"], "")
-  channel = Channel(String).new
+  blockchain << Block.new(0, Time.local.to_s, [Transaction.create_coinbase], "")
+  channel = Channel(Transaction).new
 
   get "/" do
     blockchain.to_json
   end
 
   post "/add_transaction" do |env|
-    sender = env.params.json["sender"].as(String)
+    # sender = env.params.json["sender"].as(String)
     amount = env.params.json["amount"].as(Int64)
     recipient = env.params.json["recipient"].as(String)
 
-    data = "I, #{sender}, am sending #{amount} coins to #{recipient}"
+    data = Transaction.new(recipient, amount)
     channel.send(data)
     data
   end
 
   spawn do
     loop do
-      block = Block.generate(blockchain.last, "I, Bob, am sending 5 coins to Alice", channel)
+      block = Block.generate(blockchain.last, channel)
       blockchain << block if block.valid?(blockchain.last)
     end
   end
