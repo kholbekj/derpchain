@@ -1,6 +1,20 @@
 require "kemal"
 require "./block"
 require "./node"
+require "./keypair"
+require "option_parser"
+
+OptionParser.parse do |parser|
+  parser.on "-v", "--version", "Show version" do
+    puts "version 0.1"
+    exit
+  end
+
+  parser.on "-g NAME", "--generate-keys", "Generate keypair" do |name|
+    Keypair.generate(name)
+    exit
+  end
+end
 
 module Crystal::Blockchain
   VERSION = "0.1.0"

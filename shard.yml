@@ -11,8 +11,9 @@ targets:
 dependencies:
   kemal:
     github: kemalcr/kemal
-  openssl:
-    git: git@github.com:Exilor/openssl.cr.git
+  openssl_ext:
+    git: git@github.com:kholbekj/openssl_ext.git
+    version: "~> 0.1.2"
 
 crystal: 0.33.0
 

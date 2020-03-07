@@ -12,9 +12,9 @@ shards:
     github: jeromegn/kilt
     version: 0.4.0
 
-  openssl:
-    git: git@github.com:Exilor/openssl.cr.git
-    commit: 6fddd4c1be91194d0028bf5e6d673cb91c39145c
+  openssl_ext:
+    git: git@github.com:kholbekj/openssl_ext.git
+    version: 0.1.3
 
   radix:
     github: luislavena/radix
