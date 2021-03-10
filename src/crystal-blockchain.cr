@@ -5,6 +5,8 @@ require "./keypair"
 require "./transaction"
 require "option_parser"
 
+new_transaction = Transaction.new
+
 OptionParser.parse do |parser|
   parser.on "-v", "--version", "Show version" do
     puts "version 0.1"
@@ -13,6 +15,34 @@ OptionParser.parse do |parser|
 
   parser.on "-g NAME", "--generate-keys", "Generate keypair" do |name|
     Keypair.generate(name)
+    exit
+  end
+
+  parser.on "-r KEY", "--recipient KEY", "Specify transaction recipient" do |key|
+    new_transaction.recipient = key
+  end
+
+  parser.on "-a AMOUNT", "--amount AMOUNT", "Specify transaction amount" do |amount|
+    new_transaction.amount = amount.to_i64
+  end
+
+  parser.on "-n NONCE", "--nonce NONCE", "Specify transaction nonce" do |nonce|
+    new_transaction.nonce = nonce
+  end
+
+  parser.on "-p PKEY_FILE", "--private-key PKEY_FILE", "Specify private key file" do |pkf|
+    keypair = Keypair.load(pkf)
+    new_transaction.keypair = keypair
+  end
+
+  parser.on "-t", "--transaction", "Create transaction" do
+    unless new_transaction.valid_for_signing?
+      puts "Transaction can't be created!" 
+      exit
+    end
+
+    new_transaction.sign!
+    new_transaction.print
     exit
   end
 end
@@ -33,13 +63,18 @@ module Crystal::Blockchain
   end
 
   post "/add_transaction" do |env|
-    # sender = env.params.json["sender"].as(String)
+    sender_key = env.params.json["sender_key"].as(String)
+    nonce = env.params.json["nonce"].as(String)
+    signature = env.params.json["signature"].as(String)
     amount = env.params.json["amount"].as(Int64)
-    recipient = env.params.json["recipient"].as(String)
+    recipient_key = env.params.json["recipient_key"].as(String)
 
-    data = Transaction.new(recipient, amount)
-    channel.send(data)
-    data
+    transaction = Transaction.new(recipient_key, amount, sender_key, nonce, signature)
+    halt env, status_code: 403, response: "Forbidden" unless transaction.valid_signature?
+    halt env, status_code: 403, response: "Forbidden" unless transaction.funded?(blockchain.flat_map(&.transactions))
+
+    channel.send(transaction)
+    transaction
   end
 
   spawn do

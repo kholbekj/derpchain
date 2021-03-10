@@ -38,6 +38,10 @@ class Block
     @hash = calculate_hash
   end
 
+  def transactions
+    @data
+  end
+
   def calculate_hash : String
     sleep(0.01)
     plain_text = "
